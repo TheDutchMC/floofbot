@@ -1,6 +1,8 @@
 # floofbot
 Serve cat pictures to your Discord server
 
+> **Note:** Only files ending in `.jpg` (This must match **exactly**) will be used.
+
 ### Installation
 1. Download the JAR
 2. Donwload Java (8 minimum)
