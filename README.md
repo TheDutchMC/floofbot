@@ -30,3 +30,8 @@ Serve cat pictures to your Discord server
        4. ``systemctl daemon-reload``
        5. ``systemctl enable --now floofbot``
 6. Enjoy :)
+
+### Notes
+Does this bot have a reason for existing? Nope not really. But who doesn't like cat pictures.
+
+I'm not obligated to keep this bot supported, so it might work, it might not. Thats why it's open source.
