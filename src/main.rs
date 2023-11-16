@@ -3,7 +3,7 @@ use rand::Rng;
 
 //serenity crate
 use serenity::async_trait;
-use serenity::client::{validate_token, Client, Context, EventHandler};
+use serenity::client::{Client, Context, EventHandler};
 use serenity::framework::standard::{
     macros::{command, group},
     CommandResult, StandardFramework,
@@ -49,12 +49,6 @@ async fn main() {
         exit(1);
     }
     let bot_token = bot_token_env_var.unwrap();
-
-    //Validate the provided token
-    if validate_token(bot_token.as_str()).is_err() {
-        eprintln!("The provided bot token is not valid. Please check your configuration. Exiting");
-        exit(1);
-    }
 
     //Check the BOT_PREFIX environmental variable
     let bot_prefix_env_var = std::env::var("BOT_PREFIX");
@@ -122,7 +116,7 @@ async fn rawr(ctx: &Context, msg: &Message) -> CommandResult {
 
     //Get the cat pictures
     let data = ctx.data.read().await;
-    let cat_pictures = data.get::<CatPictures>().unwrap().clone();
+    let cat_pictures = data.get::<CatPictures>().unwrap();
 
     //Take a random integer between 0 and the size of the paths Vector
     let cat_pictures_count = cat_pictures.paths.len();
