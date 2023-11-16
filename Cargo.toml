@@ -1,5 +1,5 @@
 [package]
-name = "CatExplorer"
+name = "catexplorer"
 version = "0.1.0"
 authors = ["TheDutchMC04 <tobias64a@gmail.com>"]
 edition = "2018"

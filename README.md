@@ -1,7 +1,5 @@
 # CatExplorer-Bot
-Serve cat pictures to your Discord server, now rewritten in Rust!
-
-Get it prebuild on [Docker Hub](https://hub.docker.com/r/thedutchmc/catexplorer)
+Serve cat pictures to your Discord server.s
 
 Environmental variables:
 `BOT_TOKEN`: The Discord token to use for the bot

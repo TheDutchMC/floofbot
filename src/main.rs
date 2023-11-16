@@ -4,19 +4,15 @@ use rand::Rng;
 //serenity crate
 use serenity::async_trait;
 use serenity::client::{validate_token, Client, Context, EventHandler};
-use serenity::model::channel::Message;
 use serenity::framework::standard::{
-    StandardFramework,
-    CommandResult,
-    macros::{
-        command,
-        group
-    }
+    macros::{command, group},
+    CommandResult, StandardFramework,
 };
+use serenity::model::channel::Message;
 
-use std::process::exit;
-use std::path::PathBuf;
 use serenity::http::AttachmentType;
+use std::path::PathBuf;
+use std::process::exit;
 
 #[group]
 #[commands(rawr)]
@@ -28,7 +24,7 @@ struct Handler;
 impl EventHandler for Handler {}
 
 struct CatPictures {
-    paths: Vec<PathBuf>
+    paths: Vec<PathBuf>,
 }
 
 impl serenity::prelude::TypeMapKey for CatPictures {
@@ -37,14 +33,12 @@ impl serenity::prelude::TypeMapKey for CatPictures {
 
 impl CatPictures {
     pub fn new(paths: Vec<PathBuf>) -> CatPictures {
-        CatPictures {
-            paths
-        }
+        CatPictures { paths }
     }
 }
 
 #[tokio::main]
-async fn main() -> () {
+async fn main() {
     println!("Loading CatExplorer!");
 
     //Check BOT_TOKEN environmental variable
@@ -64,22 +58,19 @@ async fn main() -> () {
 
     //Check the BOT_PREFIX environmental variable
     let bot_prefix_env_var = std::env::var("BOT_PREFIX");
-    let bot_prefix: String;
-    if bot_prefix_env_var.is_err() {
+    let bot_prefix = if bot_prefix_env_var.is_err() {
         //User did not supply a prefix, use the default of '$'
         println!("Environmental variable 'BOT_PREFIX' not set. Using default prefix '$'");
-        bot_prefix = "$".to_string();
+        "$".to_string()
     } else {
-        bot_prefix = bot_prefix_env_var.unwrap();
-    }
+        bot_prefix_env_var.unwrap()
+    };
 
     //Read the /data directory, this is where the cat pictures are stored
     let mut cat_paths = Vec::new();
     for entry in glob::glob("/data/*").expect("Failed to read glob pattern") {
         match entry {
-            Ok(path) => {
-                cat_paths.push(path)
-            },
+            Ok(path) => cat_paths.push(path),
             Err(e) => eprintln!("{:?}", e),
         }
     }
@@ -120,11 +111,14 @@ async fn start_bot(bot_token: String, bot_prefix: String, cat_paths: Vec<PathBuf
 #[command]
 async fn rawr(ctx: &Context, msg: &Message) -> CommandResult {
     //Send a message indicating that we're preparing the cat picture
-    msg.channel_id.send_message(ctx, |m| {
-        m.content("Preparing floof...");
+    msg.channel_id
+        .send_message(ctx, |m| {
+            m.content("Preparing floof...");
 
-        m
-    }).await.unwrap();
+            m
+        })
+        .await
+        .unwrap();
 
     //Get the cat pictures
     let data = ctx.data.read().await;
@@ -135,28 +129,45 @@ async fn rawr(ctx: &Context, msg: &Message) -> CommandResult {
     let random_integer: usize = rand::thread_rng().gen_range(0..cat_pictures_count);
 
     //Get the picture at the random integer
-    let pic = cat_pictures.paths.get(random_integer).expect("Error, pic not found!").clone();
+    let pic = cat_pictures
+        .paths
+        .get(random_integer)
+        .expect("Error, pic not found!")
+        .clone();
 
     //Convert the picture path to a String, then remove /data/ from the Stirng. This leaves behind
     //just the filename. So '/data/example.png' becomes 'example.png'
     //Then concat it with 'attachment://'
-    let attachment_name: String = ["attachment://", pic.as_path().to_str().unwrap().replace("/data/", "").as_str()].concat();
+    let attachment_name: String = [
+        "attachment://",
+        pic.as_path()
+            .to_str()
+            .unwrap()
+            .replace("/data/", "")
+            .as_str(),
+    ]
+    .concat();
 
     //Create message, create an embed, and send the message
-    msg.channel_id.send_message(&ctx.http, |m| {
-        m.embed(|e| {
-            e.title(format!("Floof number {}/{}:", random_integer+1, cat_pictures_count));
-            e.color(0xa1a1a1); //Gray-ish color
-            e.image(attachment_name);
+    msg.channel_id
+        .send_message(&ctx.http, |m| {
+            m.embed(|e| {
+                e.title(format!(
+                    "Floof number {}/{}:",
+                    random_integer + 1,
+                    cat_pictures_count
+                ));
+                e.color(0xa1a1a1); //Gray-ish color
+                e.image(attachment_name);
 
-            //See comment for 'return m;'
-            return e;
-        });
-        m.add_file(AttachmentType::Path(&pic));
+                e
+            });
+            m.add_file(AttachmentType::Path(&pic));
 
-        //Yes I know you can just do 'm', but this is more clear in my opinion
-        return m;
-    }).await.unwrap();
+            m
+        })
+        .await
+        .unwrap();
 
     Ok(())
 }
